@@ -250,11 +250,13 @@
 
     function togglePlay() {
         if (!action) {
+toggleInput(false) ;
             action = setInterval(function () {
                 dragok = false;
                 cal();
             });
         } else {
+toggleInput(true) ;
             clearInterval(action)
             action = null;
             dragok = true;
@@ -350,6 +352,23 @@
         document.getElementById("g").value = g.toFixed(2);
         document.getElementById("shadow").checked = showShadow;
     }
+
+function toggleInput(isDisable) 
+{
+
+document.getElementById("alpha-1").disabled = isDisable;
+        document.getElementById("m-1").disabled = isDisable;
+        document.getElementById("size-1").disabled = isDisable;
+        document.getElementById("length-1").disabled = isDisable;
+
+        document.getElementById("alpha-2").disabled = isDisable;
+        document.getElementById("size-2").disabled = isDisable;
+        document.getElementById("length-2").disabled = isDisable;
+
+        document.getElementById("time").disabled = isDisable;
+        document.getElementById("g").disabled = isDisable;
+        document.getElementById("shadow").disabled = isDisable;
+} 
 
     function shadow() {
         if (colorCoor.length <= 5)
