@@ -250,13 +250,13 @@
 
     function togglePlay() {
         if (!action) {
-toggleInput(false) ;
+toggleInput(true) ;
             action = setInterval(function () {
                 dragok = false;
                 cal();
             });
         } else {
-toggleInput(true) ;
+toggleInput(false) ;
             clearInterval(action)
             action = null;
             dragok = true;
