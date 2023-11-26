@@ -110,9 +110,10 @@
                 <p>sec per step: <input type="number" id="time" /></p>
                 <p>gravity: <input type="number" id="g" /></p>
             </div>
-            <div id="shadow">
+            <div>
                 <p>shadow: <input type="checkbox" id="shadow" /></p>
-            </div>
+                <input id="range" type="range" min="1" max="20" step="1">
+            </div>
         </div>
     </div>
     <canvas id="canvas" style="border:1px solid #d3d3d3;"></canvas>
@@ -123,44 +124,50 @@
     document.getElementsByTagName("canvas")[0].style.margin = `${boder}px`;
     document.getElementsByClassName("panel")[0].setAttribute("style", `top:${boder}px;left:${boder}px;bottom:${boder}px`);
     document.getElementById("shadow").checked = true;
+    document.getElementById("range").value = shadowRange;
     document.getElementById("alpha-1").addEventListener('input', (event) => {
         alpha1 = parseFloat(event.target.value) * (Math.PI / 180)
     })
     document.getElementById("alpha-2").addEventListener('input', (event) => {
         alpha2 = parseFloat(event.target.value) * (Math.PI / 180)
     })
-    document.getElementById("m-1").addEventListener('change', (event) => {
+    document.getElementById("m-1").addEventListener('input', (event) => {
         m1 = parseFloat(event.target.value)
     })
-    document.getElementById("m-2").addEventListener('change', (event) => {
+    document.getElementById("m-2").addEventListener('input', (event) => {
         m2 = parseFloat(event.target.value)
     })
-    document.getElementById("size-1").addEventListener('change', (event) => {
+    document.getElementById("size-1").addEventListener('input', (event) => {
         ballSize1 = parseFloat(event.target.value)
     })
-    document.getElementById("size-2").addEventListener('change', (event) => {
+    document.getElementById("size-2").addEventListener('input', (event) => {
         ballSize2 = parseFloat(event.target.value)
     })
-    document.getElementById("length-1").addEventListener('change', (event) => {
+    document.getElementById("length-1").addEventListener('input', (event) => {
         l1 = parseFloat(event.target.value)
     })
-    document.getElementById("length-2").addEventListener('change', (event) => {
+    document.getElementById("length-2").addEventListener('input', (event) => {
         l2 = parseFloat(event.target.value)
     })
-    document.getElementById("time").addEventListener('change', (event) => {
+    document.getElementById("time").addEventListener('input', (event) => {
         time = parseFloat(event.target.value)
     })
-    document.getElementById("g").addEventListener('change', (event) => {
+    document.getElementById("g").addEventListener('input', (event) => {
         g = parseFloat(event.target.value)
     })
     document.getElementById("shadow").addEventListener('change', (event) => {
         showShadow = event.target.checked
         colorCoor = []
+        document.getElementById("range").disabled = !event.target.checked;
+    })
+    document.getElementById("range").addEventListener('input', (event) => {
+        shadowRange = event.target.value
     })
 
     var c, draw, action;
 
-    var showShadow = false;
+    var showShadow = true;
+    var shadowRange = 5;
 
     // cravitational constant
     var g = Math.PI * Math.PI;
@@ -250,13 +257,13 @@
 
     function togglePlay() {
         if (!action) {
-toggleInput(true) ;
+            toggleInput(true);
             action = setInterval(function () {
                 dragok = false;
                 cal();
             });
         } else {
-toggleInput(false) ;
+            toggleInput(false);
             clearInterval(action)
             action = null;
             dragok = true;
@@ -353,29 +360,28 @@ toggleInput(false) ;
         document.getElementById("shadow").checked = showShadow;
     }
 
-function toggleInput(isDisable) 
-{
-
-document.getElementById("alpha-1").disabled = isDisable;
+    function toggleInput(isDisable) {
+        document.getElementById("alpha-1").disabled = isDisable;
         document.getElementById("m-1").disabled = isDisable;
-document.getElementById("m-2").disabled = isDisable;
         document.getElementById("size-1").disabled = isDisable;
         document.getElementById("length-1").disabled = isDisable;
 
         document.getElementById("alpha-2").disabled = isDisable;
+        document.getElementById("m-2").disabled = isDisable;
         document.getElementById("size-2").disabled = isDisable;
         document.getElementById("length-2").disabled = isDisable;
 
         document.getElementById("time").disabled = isDisable;
         document.getElementById("g").disabled = isDisable;
-        document.getElementById("shadow").disabled = isDisable;
-} 
+    }
 
     function shadow() {
-        if (colorCoor.length <= 5)
+        if (colorCoor.length <= shadowRange)
             colorCoor.push([x1, y1, x2, y2]);
         else {
-            colorCoor.shift();
+            for (var i = 0; i < colorCoor.length - shadowRange; i++) {
+                colorCoor.shift();
+            }
             colorCoor.push([x1, y1, x2, y2]);
         }
         for (var i = 0; i < colorCoor.length; i++) {
