@@ -112,9 +112,7 @@
             </div>
             <div id="shadow">
                 <p>shadow: <input type="checkbox" id="shadow" /></p>
-            </div>
-
-            <button id="btn"></button>
+            </div>
         </div>
     </div>
     <canvas id="canvas" style="border:1px solid #d3d3d3;"></canvas>
@@ -125,7 +123,6 @@
     document.getElementsByTagName("canvas")[0].style.margin = `${boder}px`;
     document.getElementsByClassName("panel")[0].setAttribute("style", `top:${boder}px;left:${boder}px;bottom:${boder}px`);
     document.getElementById("shadow").checked = true;
-    document.getElementById("btn").innerHTML = action ? "Pause" : "Start";
     document.getElementById("alpha-1").addEventListener('change', (event) => {
         alpha1 = parseFloat(event.target.value) * (Math.PI / 180)
     })
@@ -159,9 +156,6 @@
     document.getElementById("shadow").addEventListener('change', (event) => {
         showShadow = event.target.checked
         colorCoor = []
-    })
-    document.getElementById("btn").addEventListener('click', (event) => {
-        togglePlay();
     })
 
     var c, draw, action;
@@ -245,9 +239,7 @@
         c.onmouseup = myUp;
         c.onmousemove = ballHover
 
-        c.ontouchstart = myDown;
-        c.ontouchend = myUp;
-        c.ontouchmove = ballHover
+        c.ontouchstart = togglePlay;
 
         document.addEventListener('keydown', function (event) {
             if (event.code == 'Enter') {
