@@ -90,7 +90,7 @@
                 <p>accelerate: <span id="a-1"></span></p>
                 <p>velocity: <span id="v-1"></span></p>
                 <p>coordinate: <span id="coor-1"></span></p>
-                <p>alpha (&deg;C): <input type="number" id="alpha-1" /></p>
+                <p>degree(&deg;C): <input type="number" id="alpha-1" /></p>
                 <p>mass: <input type="number" id="m-1" /></p>
                 <p>size: <input type="number" id="size-1" /></p>
                 <p>string length: <input type="number" id="length-1" /></p>
@@ -100,7 +100,7 @@
                 <p>accelerate: <span id="a-2"></span></p>
                 <p>velocity: <span id="v-2"></span></p>
                 <p>coordinate: <span id="coor-2"></span></p>
-                <p>alpha (&deg;C): <input type="number" id="alpha-2" /></p>
+                <p>degree (&deg;C): <input type="number" id="alpha-2" /></p>
                 <p>mass: <input type="number" id="m-2" /></p>
                 <p>size: <input type="number" id="size-2" /></p>
                 <p>string length: <input type="number" id="length-2" /></p>
@@ -123,10 +123,10 @@
     document.getElementsByTagName("canvas")[0].style.margin = `${boder}px`;
     document.getElementsByClassName("panel")[0].setAttribute("style", `top:${boder}px;left:${boder}px;bottom:${boder}px`);
     document.getElementById("shadow").checked = true;
-    document.getElementById("alpha-1").addEventListener('change', (event) => {
+    document.getElementById("alpha-1").addEventListener('input', (event) => {
         alpha1 = parseFloat(event.target.value) * (Math.PI / 180)
     })
-    document.getElementById("alpha-2").addEventListener('change', (event) => {
+    document.getElementById("alpha-2").addEventListener('input', (event) => {
         alpha2 = parseFloat(event.target.value) * (Math.PI / 180)
     })
     document.getElementById("m-1").addEventListener('change', (event) => {
