@@ -44,6 +44,14 @@
 
     .panel input {
         margin-top: 5px;
+        width: 100%;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+    }
+
+    .panel input[type="checkbox"] {
+        width: auto;
     }
 
     .panel #bg {
@@ -64,6 +72,12 @@
         padding: 10px;
         position: relative;
         z-index: 100;
+
+        overflow-y: auto;
+    }
+
+    .panel #btn {
+        width: 100%;
     }
 </style>
 
@@ -99,6 +113,8 @@
             <div id="shadow">
                 <p>shadow: <input type="checkbox" id="shadow" /></p>
             </div>
+
+            <button id="btn"></button>
         </div>
     </div>
     <canvas id="canvas" style="border:1px solid #d3d3d3;"></canvas>
@@ -109,6 +125,7 @@
     document.getElementsByTagName("canvas")[0].style.margin = `${boder}px`;
     document.getElementsByClassName("panel")[0].setAttribute("style", `top:${boder}px;left:${boder}px;bottom:${boder}px`);
     document.getElementById("shadow").checked = true;
+    document.getElementById("btn").innerHTML = action ? "Pause" : "Start";
     document.getElementById("alpha-1").addEventListener('change', (event) => {
         alpha1 = parseFloat(event.target.value) * (Math.PI / 180)
     })
@@ -141,6 +158,10 @@
     })
     document.getElementById("shadow").addEventListener('change', (event) => {
         showShadow = event.target.checked
+        colorCoor = []
+    })
+    document.getElementById("btn").addEventListener('click', (event) => {
+        togglePlay();
     })
 
     var c, draw, action;
@@ -218,26 +239,34 @@
         setUpCanvas()
         calXY();
         updatePanelValue();
-        setInterval(render, 16);
+        window.requestAnimationFrame(render)
 
         c.onmousedown = myDown;
         c.onmouseup = myUp;
         c.onmousemove = ballHover
 
+        c.ontouchstart = myDown;
+        c.ontouchend = myUp;
+        c.ontouchmove = ballHover
+
         document.addEventListener('keydown', function (event) {
             if (event.code == 'Enter') {
-                if (!action) {
-                    action = setInterval(function () {
-                        dragok = false;
-                        cal();
-                    });
-                } else {
-                    clearInterval(action)
-                    action = null;
-                    dragok = true;
-                }
+                togglePlay()
             }
         }, true);
+    }
+
+    function togglePlay() {
+        if (!action) {
+            action = setInterval(function () {
+                dragok = false;
+                cal();
+            });
+        } else {
+            clearInterval(action)
+            action = null;
+            dragok = true;
+        }
     }
 
     function calXY() {
@@ -305,6 +334,7 @@
         if (action || document.body.style.cursor === "grabbing") {
             updatePanelValue();
         }
+        window.requestAnimationFrame(render)
     }
 
     function updatePanelValue() {
@@ -330,7 +360,7 @@
     }
 
     function shadow() {
-        if (colorCoor.length <= 25)
+        if (colorCoor.length <= 5)
             colorCoor.push([x1, y1, x2, y2]);
         else {
             colorCoor.shift();
@@ -373,7 +403,6 @@
 
     function myMove1(e) {
         if (dragok) {
-
             x1 = dragCoor.x + (e.pageX - c.offsetLeft);
             y1 = dragCoor.y + (e.pageY - c.offsetTop);
             l1 = Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1))
@@ -389,7 +418,6 @@
 
     function myMove2(e) {
         if (dragok) {
-
             x2 = dragCoor.x + (e.pageX - c.offsetLeft);
             y2 = dragCoor.y + (e.pageY - c.offsetTop);
 
