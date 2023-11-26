@@ -120,6 +120,10 @@
 </body>
 <script>
 
+    window.addEventListener("resize", function (event) {
+        setUpCanvas();
+    })
+
     var boder = 30;
     document.getElementsByTagName("canvas")[0].style.margin = `${boder}px`;
     document.getElementsByClassName("panel")[0].setAttribute("style", `top:${boder}px;left:${boder}px;bottom:${boder}px`);
@@ -227,6 +231,9 @@
 
         x = c.width / 2;
         y = c.height - (c.height - 100);
+
+        calXY();
+        updatePanelValue();
     }
 
     function findAngle(A, B, C) {
@@ -238,8 +245,6 @@
 
     function begin() {
         setUpCanvas()
-        calXY();
-        updatePanelValue();
         window.requestAnimationFrame(render)
 
         c.onmousedown = myDown;
