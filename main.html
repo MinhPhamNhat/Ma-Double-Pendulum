@@ -26,6 +26,27 @@
         display: flex;
         align-items: center;
         justify-content: center;
+
+        font-family: cursive;
+    }
+
+    body input {
+        font-family: cursive;
+    }
+
+    body.black-theme * {
+        color: black !important;
+        transition: 0.3s;
+    }
+
+    body.white-theme * {
+        color: white !important;
+        transition: 0.3s;
+    }
+
+    body.white-theme input {
+        color: black !important;
+        transition: 0.3s;
     }
 
     canvas {
@@ -40,6 +61,19 @@
         width: 100vw;
     }
 
+
+    body.black-theme * {
+        color: black !important;
+        transition: 0.3s;
+    }
+
+    body.white-theme .panel-control {
+        background: rgba(0, 0, 0, 0.41);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
     .panel-control {
         box-sizing: border-box;
         user-select: none;
@@ -47,7 +81,7 @@
         z-index: 10;
         transition: 0.3s;
         width: 0PX;
-        /* From https://css.glass */
+
         background: rgba(255, 255, 255, 0.41);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(5px);
@@ -79,17 +113,16 @@
     }
 
     .panel-control #controller-container::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(153, 153, 153, 0.3);
-        background-color: #F5F5F5;
+        background-color: transparent;
     }
 
     .panel-control #controller-container::-webkit-scrollbar {
         width: 1px;
-        background-color: #F5F5F5;
+        background-color: transparent;
     }
 
     .panel-control #controller-container::-webkit-scrollbar-thumb {
-        background-color: #adadad;
+        background-color: transparent;
     }
 
     .panel-control #controller-container #controller {
@@ -124,6 +157,13 @@
         -webkit-backdrop-filter: blur(5.2px);
     }
 
+    body.white-theme #close-btn {
+        background: rgba(0, 0, 0, 0.6);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5.2px);
+        -webkit-backdrop-filter: blur(5.2px);
+    }
+
     .panel-control.active {
         width: 220px;
         transition: 0.3s;
@@ -144,11 +184,6 @@
         bottom: 0;
 
         transition: 0.3s;
-
-        background: rgba(255, 255, 255, 0.6);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(5.2px);
-        -webkit-backdrop-filter: blur(5.2px);
     }
 
     .panel-control.active #close-btn span {
@@ -172,7 +207,6 @@
         bottom: 0;
         right: 10px;
 
-        color: white;
         height: 100%;
         font-size: 30px;
 
@@ -219,7 +253,6 @@
         position: absolute;
         left: 10px;
 
-        color: white;
         height: 100%;
         font-size: 30px;
 
@@ -242,6 +275,15 @@
         left: 10px;
 
         background: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5.2px);
+        -webkit-backdrop-filter: blur(5.2px);
+    }
+
+    body.white-theme .panel-control:not(.active) #close-btn span,
+    body.white-theme .panel-control:not(.active) #close-btn span #top,
+    body.white-theme .panel-control:not(.active) #close-btn span #bottom {
+        background: rgba(0, 0, 0, 0.6);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(5.2px);
         -webkit-backdrop-filter: blur(5.2px);
@@ -335,9 +377,14 @@
                     <p>time per step: <input type="number" id="time" /></p>
                     <p>gravity: <input type="number" id="g" /></p>
                 </div>
-                <div>
-                    <p>shadow: <input type="checkbox" id="shadow" /></p>
-                    <input id="range" type="range" min="1" max="20" step="1">
+                <div id="style">
+                    <h3>Style</h3>
+                    <div>
+                        <p>shadow [S]: <input type="checkbox" id="shadow" /></p>
+                        <input id="range" type="range" min="1" max="20" step="1">
+                    </div>
+                    <p>background (url): <input type="url" id="background" /></p>
+                    <p>theme [T]: <input type="checkbox" id="theme" /></p>
                 </div>
             </div>
         </div>
@@ -355,6 +402,8 @@
     </canvas>
 </body>
 <script>
+    var themeDefault = 'black';
+
     window.addEventListener("resize", function (event) {
         setUpCanvas();
     })
@@ -398,12 +447,13 @@
         g = parseFloat(event.target.value)
     })
     document.getElementById("shadow").addEventListener('change', (event) => {
-        showShadow = event.target.checked
-        colorCoor = []
-        document.getElementById("range").disabled = !event.target.checked;
+        toggleShadow()
     })
-    document.getElementById("range").addEventListener('input', (event) => {
-        shadowRange = event.target.value
+    document.getElementById("theme").addEventListener('change', (event) => {
+        toggleTheme()
+    })
+    document.getElementById("background").addEventListener('input', (event) => {
+        document.getElementsByTagName("body")[0].style.backgroundImage = `url(${event.target.value})`
     })
 
     var c, draw, action;
@@ -463,6 +513,7 @@
         c.height = window.innerHeight - boder * 2;
 
         draw = c.getContext("2d");
+        draw.font = "cursive";
 
         x = c.width / 2;
         y = c.height - (c.height - 100);
@@ -492,8 +543,12 @@
             console.log(event.code)
             if (event.code == 'Space') {
                 togglePlay()
-            } else if (event.code == 'ShiftLeft') {
+            } else if (event.code == 'KeyN') {
                 toggleMenu()
+            } else if (event.code == 'KeyT') {
+                toggleTheme()
+            } else if (event.code == 'KeyS') {
+                toggleShadow()
             }
         }, true);
     }
@@ -511,6 +566,22 @@
             action = null;
             dragok = true;
         }
+    }
+
+    function toggleShadow() {
+        showShadow = !showShadow
+        colorCoor = []
+        document.getElementById("shadow").checked = showShadow
+    }
+
+    function toggleTheme() {
+        if (themeDefault == 'black') {
+            themeDefault = 'white'
+        } else {
+            themeDefault = 'black'
+        }
+        document.getElementById("theme").checked = themeDefault == 'white'
+        document.getElementsByTagName("body")[0].className = `${themeDefault}-theme`;
     }
 
     function calXY() {
@@ -546,12 +617,12 @@
         draw.lineTo(x2, y2);
         draw.lineCap = 'round';
         draw.lineWidth = 5;
-        draw.strokeStyle = 'black';
+        draw.strokeStyle = themeDefault;
         draw.stroke();
         draw.closePath();
 
         // render 1st ball 
-        draw.fillStyle = (hoverOn && ballHoveredId === 1) ? "blue" : 'black'
+        draw.fillStyle = (hoverOn && ballHoveredId === 1) ? "blue" : themeDefault
         draw.beginPath();
         draw.arc(x1, y1, ballSize1, 0, 2 * Math.PI);
         draw.closePath();
@@ -560,7 +631,7 @@
         draw.closePath();
 
         // render 2nd ball
-        draw.fillStyle = (hoverOn && ballHoveredId === 2) ? "red" : 'black'
+        draw.fillStyle = (hoverOn && ballHoveredId === 2) ? "red" : themeDefault
         draw.beginPath();
         draw.arc(x2, y2, ballSize2, 0, 2 * Math.PI);
         draw.closePath();
@@ -568,8 +639,8 @@
         draw.fill();
         draw.closePath();
 
-        draw.fillStyle = 'black'
-        draw.font = '36px serif';
+        draw.fillStyle = themeDefault
+        draw.font = 'italic bold 36px cursive';
         draw.textAlign = "center"
         draw.beginPath();
         draw.fillText(`Press "Space" to ${action ? "pause" : "start"}`, c.width / 2, c.height - 50);
