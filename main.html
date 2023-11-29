@@ -6,7 +6,6 @@
 </head>
 <style>
     body {
-        background-image: url("https://i.pinimg.com/originals/2e/aa/a1/2eaaa1c4a692708637e0e3c1d569f958.png");
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
@@ -30,6 +29,14 @@
         font-family: cursive;
     }
 
+    body.white-theme {
+        background-color: black;
+    }
+
+    body.black-theme {
+        background-color: white;
+    }
+
     body input {
         font-family: cursive;
     }
@@ -50,9 +57,13 @@
     }
 
     canvas {
-        box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 4px 0px, rgba(0, 0, 0, 0.32) 0px 2px 16px 0px;
         border: none !important;
         position: absolute;
+    }
+
+    body.white-theme canvas {
+        box-shadow: rgba(255, 255, 255, 0.12) 0px 2px 4px 0px, rgba(255, 255, 255, 0.32) 0px 2px 16px 0px;
     }
 
     img {
@@ -69,7 +80,7 @@
 
     body.white-theme .panel-control {
         background: rgba(0, 0, 0, 0.41);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 30px rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
     }
@@ -159,7 +170,7 @@
 
     body.white-theme #close-btn {
         background: rgba(0, 0, 0, 0.6);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 30px rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(5.2px);
         -webkit-backdrop-filter: blur(5.2px);
     }
@@ -284,7 +295,7 @@
     body.white-theme .panel-control:not(.active) #close-btn span #top,
     body.white-theme .panel-control:not(.active) #close-btn span #bottom {
         background: rgba(0, 0, 0, 0.6);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 30px rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(5.2px);
         -webkit-backdrop-filter: blur(5.2px);
     }
@@ -411,11 +422,15 @@
     var boder = 30;
     var showShadow = true;
     var shadowRange = 5;
+    var background = "https://i.pinimg.com/originals/2e/aa/a1/2eaaa1c4a692708637e0e3c1d569f958.png"
 
     document.getElementById("close-btn").addEventListener('click', toggleMenu)
     document.getElementsByClassName("panel-control")[0].setAttribute("style", `height: calc(100% - ${boder * 2}px);left:${boder}px`);
     document.getElementById("shadow").checked = showShadow;
     document.getElementById("range").value = shadowRange;
+    document.getElementsByTagName("body")[0].style.backgroundImage = `url(${background})`;
+    document.getElementById("background").value = background;
+
     document.getElementById("alpha-1").addEventListener('input', (event) => {
         alpha1 = parseFloat(event.target.value) * (Math.PI / 180)
     })
@@ -448,6 +463,9 @@
     })
     document.getElementById("shadow").addEventListener('change', (event) => {
         toggleShadow()
+    })
+    document.getElementById("range").addEventListener('input', (event) => {
+        shadowRange = event.target.value
     })
     document.getElementById("theme").addEventListener('change', (event) => {
         toggleTheme()
