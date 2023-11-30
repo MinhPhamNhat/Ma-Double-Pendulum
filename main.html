@@ -29,7 +29,7 @@
         align-items: center;
         justify-content: center;
 
-        font-family: 'Lexend', sans-serif;
+        font-family: 'Lexend', Times;
     }
 
     body.white-theme {
@@ -388,17 +388,18 @@
                 </div>
                 <div id="general">
                     <h3>General</h3>
-                    <p>time per step: <input type="number" id="time" /></p>
                     <p>gravity: <input type="number" id="g" /></p>
+                    <p>friction: <input type="number" id="friction" min="0" max="1" step="0.001"/></p>
                 </div>
                 <div id="style">
                     <h3>Style</h3>
+                    <p>time: <span id="time"></span><input id="time-range" type="range" min="1" max="50" step="1"></p>
                     <div>
                         <p>shadow [S]: <input type="checkbox" id="shadow" /></p>
-                        <input id="range" type="range" min="1" max="20" step="1">
+                        <input id="shadow-range" type="range" min="1" max="100" step="1">
                     </div>
-                    <p>background (url): <input type="url" id="background" /></p>
                     <p>theme [T]: <input type="checkbox" id="theme" /></p>
+                    <p>background (url): <input type="url" id="background" /></p>
                 </div>
             </div>
         </div>
@@ -422,16 +423,15 @@
         setUpCanvas();
     })
 
-    var boder = 30;
+    var border = 30;
     var showShadow = true;
     var shadowRange = 5;
     var background = "https://i.pinimg.com/originals/2e/aa/a1/2eaaa1c4a692708637e0e3c1d569f958.png"
 
     document.getElementById("close-btn").addEventListener('click', toggleMenu)
-    document.getElementsByClassName("panel-control")[0].setAttribute("style", `height: calc(100% - ${boder * 2}px);left:${boder}px`);
-    document.getElementById("shadow").checked = showShadow;
-    document.getElementById("range").value = shadowRange;
+    document.getElementsByClassName("panel-control")[0].setAttribute("style", `height: calc(100% - ${border * 2}px);left:${border}px`);
     document.getElementsByTagName("body")[0].style.backgroundImage = `url(${background})`;
+    document.getElementById("shadow-range").value = shadowRange;
     document.getElementById("background").value = background;
 
     document.getElementById("alpha-1").addEventListener('input', (event) => {
@@ -467,7 +467,14 @@
     document.getElementById("shadow").addEventListener('change', (event) => {
         toggleShadow()
     })
-    document.getElementById("range").addEventListener('input', (event) => {
+    document.getElementById("time-range").addEventListener('input', (event) => {
+        time = event.target.value
+        document.getElementById("time").innerHTML = `${(1 / (time / 10)).toFixed(2).replace(/[.,]00$/, "")}x`
+    })
+    document.getElementById("friction").addEventListener('input', (event) => {
+        friction = event.target.value
+    })
+    document.getElementById("shadow-range").addEventListener('input', (event) => {
         shadowRange = event.target.value
     })
     document.getElementById("theme").addEventListener('change', (event) => {
@@ -479,8 +486,14 @@
 
     var c, draw, action;
 
-    // cravitational constant
+    // gravitational constant
     var g = Math.PI * Math.PI;
+
+    // time per step
+    var time = 10;
+
+    // friction
+    var friction = 0.005;
 
     // ball coor
     var x1, y1, x2, y2;
@@ -505,16 +518,13 @@
     var m1 = 10;
     var m2 = 10;
 
-    // size of ball
-    var ballSize1 = 20;
-    var ballSize2 = 20;
-
-    // time per step
-    var time = 15;
-
     // the origin coor 
     var x = window.innerWidth / 2;
     var y = 100;
+
+    // size of ball
+    var ballSize1 = 20;
+    var ballSize2 = 20;
 
     // drag action catch
     var dragok = false;
@@ -530,8 +540,8 @@
     function setUpCanvas() {
         c = document.getElementById("canvas");
 
-        c.width = window.innerWidth - boder * 2;
-        c.height = window.innerHeight - boder * 2;
+        c.width = window.innerWidth - border * 2;
+        c.height = window.innerHeight - border * 2;
 
         draw = c.getContext("2d");
 
@@ -551,6 +561,7 @@
 
     function begin() {
         setUpCanvas()
+        updatePanelValue()
         window.requestAnimationFrame(render)
 
         c.onmousedown = myDown;
@@ -612,13 +623,13 @@
     }
 
     function calA() {
-        a1 = (-g * (2 * m1 + m2) * Math.sin(alpha1) - m2 * g * Math.sin(alpha1 - 2 * alpha2) - 2 * Math.sin(alpha1 - alpha2) * m2 * (v2 * v2 * l2 + v1 * v1 * l1 * Math.cos(alpha1 - alpha2))) / (l1 * (2 * m1 + m2 - m2 * Math.cos(2 * alpha1 - 2 * alpha2)));
-        a2 = (2 * Math.sin(alpha1 - alpha2) * (v1 * v1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.cos(alpha1) + v2 * v2 * l2 * m2 * Math.cos(alpha1 - alpha2))) / (l2 * (2 * m1 + m2 - m2 * Math.cos(2 * alpha1 - 2 * alpha2)));
+        a1 = (-g * (2 * m1 + m2) * Math.sin(alpha1) - m2 * g * Math.sin(alpha1 - 2 * alpha2) - 2 * Math.sin(alpha1 - alpha2) * m2 * (v2 * v2 * l2 + v1 * v1 * l1 * Math.cos(alpha1 - alpha2)) - friction * v1) / (l1 * (2 * m1 + m2 - m2 * Math.cos(2 * alpha1 - 2 * alpha2)));
+        a2 = (2 * Math.sin(alpha1 - alpha2) * (v1 * v1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.cos(alpha1) + v2 * v2 * l2 * m2 * Math.cos(alpha1 - alpha2)) - friction * v2) / (l2 * (2 * m1 + m2 - m2 * Math.cos(2 * alpha1 - 2 * alpha2)));
     }
 
     function cal() {
-        v1 += a1 / time;
-        v2 += a2 / time;
+        v1 += (a1 - friction * v1) / time;
+        v2 += (a2 - friction * v2) / time;
         alpha1 += v1 / time;
         alpha2 += v2 / time;
         calA();
@@ -669,29 +680,33 @@
         if (action || document.body.style.cursor === "grabbing") {
             updatePanelValue();
         }
+
         window.requestAnimationFrame(render)
     }
 
     function updatePanelValue() {
-        document.getElementById("a-1").innerHTML = Math.abs(a1 * time).toFixed(2);
-        document.getElementById("v-1").innerHTML = Math.abs(v1 * time * time).toFixed(2);
+        document.getElementById("a-1").innerHTML = Math.abs(a1 * 100).toFixed(2);
+        document.getElementById("v-1").innerHTML = Math.abs(v1 * 100).toFixed(2);
         document.getElementById("coor-1").innerHTML = `(${Math.round(x1)}, ${Math.round(y1)})`;
         document.getElementById("alpha-1").value = Math.round((alpha1 * 180 / Math.PI) % 180);
         document.getElementById("m-1").value = m1;
         document.getElementById("size-1").value = ballSize1;
         document.getElementById("length-1").value = Math.round(l1);
 
-        document.getElementById("a-2").innerHTML = Math.abs(a2 * time).toFixed(2);
-        document.getElementById("v-2").innerHTML = Math.abs(v2 * time * time).toFixed(2);
+        document.getElementById("a-2").innerHTML = Math.abs(a2 * 100).toFixed(2);
+        document.getElementById("v-2").innerHTML = Math.abs(v2 * 100).toFixed(2);
         document.getElementById("coor-2").innerHTML = `(${Math.round(x2)}, ${Math.round(y2)})`;
         document.getElementById("alpha-2").value = Math.round((alpha2 * 180 / Math.PI) % 180);
         document.getElementById("m-2").value = m2;
         document.getElementById("size-2").value = ballSize2;
         document.getElementById("length-2").value = Math.round(l2);
 
-        document.getElementById("time").value = time;
         document.getElementById("g").value = g.toFixed(2);
         document.getElementById("shadow").checked = showShadow;
+        document.getElementById("time-range").value = time;
+        document.getElementById("friction").value = friction;
+        
+        document.getElementById("time").innerHTML = `${(1 / (time / 10)).toFixed(2).replace(/[.,]00$/, "")}x`
     }
 
     function toggleInput(isDisable) {
@@ -705,8 +720,8 @@
         document.getElementById("size-2").disabled = isDisable;
         document.getElementById("length-2").disabled = isDisable;
 
-        document.getElementById("time").disabled = isDisable;
         document.getElementById("g").disabled = isDisable;
+        document.getElementById("friction").disabled = isDisable;
     }
 
     function toggleMenu() {
