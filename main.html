@@ -2,6 +2,9 @@
 <html>
 
 <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400&display=swap" rel="stylesheet">
     <meta charset="utf-8">
 </head>
 <style>
@@ -26,7 +29,7 @@
         align-items: center;
         justify-content: center;
 
-        font-family: cursive;
+        font-family: 'Lexend', sans-serif;
     }
 
     body.white-theme {
@@ -658,7 +661,7 @@
         draw.closePath();
 
         draw.fillStyle = themeDefault
-        draw.font = 'italic bold 36px cursive';
+        draw.font = 'italic 36px Lexend';
         draw.textAlign = "center"
         draw.beginPath();
         draw.fillText(`Press "Space" to ${action ? "pause" : "start"}`, c.width / 2, c.height - 50);
